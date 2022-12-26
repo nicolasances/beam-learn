@@ -1,5 +1,6 @@
 import apache_beam as beam
 import re
+import logging
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.io import ReadFromText
 from apache_beam.io import WriteToText
@@ -36,4 +37,5 @@ def main(argv=None, save_main_session=True):
         output | WriteToText(output_file)
 
 if __name__ == '__main__':
-  main()
+    logging.getLogger().setLevel(logging.INFO)
+    main()
