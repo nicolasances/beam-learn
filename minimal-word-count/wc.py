@@ -31,5 +31,5 @@ with beam.Pipeline(options=beam_options) as pipeline:
     
     output = counts | 'Format' >> beam.Map(format_result)
 
-    output | WriteToText(known_args.output)
+    output | WriteToText(output_file)
 
