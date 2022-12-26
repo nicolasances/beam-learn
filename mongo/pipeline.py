@@ -2,6 +2,7 @@ import apache_beam as beam
 import re
 import logging
 import argparse
+import json
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.io import ReadFromText
 from apache_beam.io import WriteToText
@@ -22,7 +23,12 @@ def main(argv=None, save_main_session=True):
 
         data = p | ReadFromMongoDB(uri = "mongodb+srv://{usr}:{pwd}@pleggit-play-cluster.2xyhv.mongodb.net/admin".format(usr = known_args.mongouser, pwd = known_args.mongopwd), db="profile", coll="profiles", bucket_auto=True)
         
-        data | WriteToText("profiles")
+        def map_to_object (bson): 
+
+            return json.loads(bson)
+
+        data | beam.Map(map_to_object)
+        | WriteToText("profiles")
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
