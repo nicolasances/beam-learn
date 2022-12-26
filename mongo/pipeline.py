@@ -27,8 +27,8 @@ def main(argv=None, save_main_session=True):
 
             return json.loads(bson)
 
-        data | beam.Map(map_to_object)
-        | WriteToText("profiles")
+        json_data = data | beam.Map(map_to_object)
+        json_data | WriteToText("profiles")
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
