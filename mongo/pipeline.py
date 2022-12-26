@@ -7,7 +7,7 @@ from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.io import ReadFromText
 from apache_beam.io import WriteToText
 from apache_beam.options.pipeline_options import SetupOptions
-from apache_beam.io.mongodbio import ReadFromMongoDB
+from apache_beam.io.mongodbio import ReadFromMongoDB, WriteToMongoDB
 
 def main(argv=None, save_main_session=True):
 
@@ -17,11 +17,13 @@ def main(argv=None, save_main_session=True):
 
     known_args, pipeline_args = parser.parse_known_args(argv)
 
+    mongo_uri = "mongodb+srv://{usr}:{pwd}@pleggit-play-cluster.2xyhv.mongodb.net/admin".format(usr = known_args.mongouser, pwd = known_args.mongopwd)
+
     beam_options = PipelineOptions()
 
     with beam.Pipeline(options = beam_options) as p: 
 
-        data = p | ReadFromMongoDB(uri = "mongodb+srv://{usr}:{pwd}@pleggit-play-cluster.2xyhv.mongodb.net/admin".format(usr = known_args.mongouser, pwd = known_args.mongopwd), db="profile", coll="profiles", bucket_auto=True)
+        data = p | ReadFromMongoDB(uri = mongo_uri, db="profile", coll="profiles", bucket_auto=True)
         
         def map_to_target (bson): 
 
@@ -31,7 +33,8 @@ def main(argv=None, save_main_session=True):
             }
 
         json_data = data | beam.Map(map_to_target)
-        json_data | WriteToText("profiles")
+        # json_data | WriteToText("profiles")
+        json_data | WriteToMongoDB(uri = mongo_uri, db = "profile", coll = "copiedProfiles")
 
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
