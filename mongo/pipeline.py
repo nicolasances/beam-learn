@@ -14,7 +14,7 @@ def main(argv=None, save_main_session=True):
     parser.add_argument( '--mongouser', default='', help='The mongo user')
     parser.add_argument( '--mongopwd', default='', help='The mongo pwd')
 
-    args, beam_args = parser.parse_known_args(argv)
+    known_args, pipeline_args = parser.parse_known_args(argv)
 
     beam_options = PipelineOptions()
 
