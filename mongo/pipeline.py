@@ -25,7 +25,10 @@ def main(argv=None, save_main_session=True):
         
         def map_to_target (bson): 
 
-            return bson["userId"]
+            return {
+                userId: bson["userId"], 
+                userComplete: bson["userComplete"]
+            }
 
         json_data = data | beam.Map(map_to_target)
         json_data | WriteToText("profiles")
