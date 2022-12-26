@@ -5,31 +5,35 @@ from apache_beam.io import ReadFromText
 from apache_beam.io import WriteToText
 from apache_beam.options.pipeline_options import SetupOptions
 
-input_file = 'input.md'
-output_file = 'output.txt'
+def main(argv=None, save_main_session=True):
 
-beam_options = PipelineOptions()
+    input_file = 'input.md'
+    output_file = 'output.txt'
 
-with beam.Pipeline(options=beam_options) as pipeline:
+    beam_options = PipelineOptions()
 
-    lines = pipeline | beam.io.ReadFromText(input_file)
+    with beam.Pipeline(options=beam_options) as pipeline:
 
-    counts = (
-        lines
-        | "Split"  >> (
-            beam.FlatMap(
-                lambda x : re.findall(r'[A-Za-z\']+', x)
-            ).with_output_types(str)
+        lines = pipeline | beam.io.ReadFromText(input_file)
+
+        counts = (
+            lines
+            | "Split"  >> (
+                beam.FlatMap(
+                    lambda x : re.findall(r'[A-Za-z\']+', x)
+                ).with_output_types(str)
+            )
+            | "PairWithOne" >> beam.Map(lambda x : (x, 1))
+            | "GroupAndSum" >> beam.CombinePerKey(sum)
         )
-        | "PairWithOne" >> beam.Map(lambda x : (x, 1))
-        | "GroupAndSum" >> beam.CombinePerKey(sum)
-    )
 
-    def format_result(word_count):
-        (word, count) = word_count
-        return '%s: %s' % (word, count)
-    
-    output = counts | 'Format' >> beam.Map(format_result)
+        def format_result(word_count):
+            (word, count) = word_count
+            return '%s: %s' % (word, count)
+        
+        output = counts | 'Format' >> beam.Map(format_result)
 
-    output | WriteToText(output_file)
+        output | WriteToText(output_file)
 
+if __name__ == '__main__':
+  main()
