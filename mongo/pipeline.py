@@ -23,11 +23,11 @@ def main(argv=None, save_main_session=True):
 
         data = p | ReadFromMongoDB(uri = "mongodb+srv://{usr}:{pwd}@pleggit-play-cluster.2xyhv.mongodb.net/admin".format(usr = known_args.mongouser, pwd = known_args.mongopwd), db="profile", coll="profiles", bucket_auto=True)
         
-        def map_to_object (bson): 
+        def map_to_target (bson): 
 
-            return json.loads(bson)
+            return bson["userId"]
 
-        json_data = data | beam.Map(map_to_object)
+        json_data = data | beam.Map(map_to_target)
         json_data | WriteToText("profiles")
 
 if __name__ == '__main__':
