@@ -6,10 +6,12 @@ output_file = 'output.txt'
 
 beam_options = PipelineOptions()
 
-pipeline = beam.Pipeline(options=beam_options)
+with beam.Pipeline(options=beam_options) as pipeline:
 
-pipeline | beam.io.ReadFromText(input_file)
-    | 'ExtractWords' >> beam.FlatMap(lambda x : re.findall(r'[A-Za-z\']+', x))
-    | beam.combiners.Count.PerElement()
-    | beam.MapTuple(lambda word, count: '%s: %s' % (word, count))
-    | beam.io.WriteToText(output_path)
+    pipeline | beam.io.ReadFromText(input_file)
+        | 'ExtractWords' >> beam.FlatMap(lambda x : re.findall(r'[A-Za-z\']+', x))
+        | beam.combiners.Count.PerElement()
+        | beam.MapTuple(lambda word, count: '%s: %s' % (word, count))
+        | beam.io.WriteToText(output_path)
+
+    pipeline.run()
