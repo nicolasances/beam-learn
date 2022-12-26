@@ -28,6 +28,7 @@ def main(argv=None, save_main_session=True):
         def map_to_target (bson): 
 
             return {
+                "_id": bson["_id"],
                 "userId": bson["userId"], 
                 "userComplete": bson["userComplete"]
             }
